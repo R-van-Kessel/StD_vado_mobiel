@@ -40,14 +40,12 @@ button:active { transform: scale(0.95); }
   display: flex;
   gap: 5px;
   padding: 5px;
-  margin-bottom: 5px;  // ← Verklein marge
   flex-wrap: nowrap;
   justify-content: center;
   position: relative;
   z-index: 1000;
   width: 100%;
   overflow-x: auto;
-  max-height: 50px;  // ← Beperk hoogte van navigatie
 }
 
 .nav a {
@@ -1648,49 +1646,3 @@ function snapBlock(block) {
   block.x = MARGIN + col * CELL_SIZE;
   block.y = MARGIN + row * CELL_SIZE + BUTTON_HEIGHT + TITLE_SPACE;
 }
-// Herbereken schaling bij scherm rotatie
-let resizeTimeout;
-window.addEventListener('resize', () => {
-    // Debounce om te veel resize calls te voorkomen
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-        if (IS_MOBILE) {
-            console.log("=== RESIZE TRIGGERED ===");
-            console.log("Window size:", window.innerWidth, "x", window.innerHeight);
-            
-            let baseCanvasWidth = COLS * CELL_SIZE + MARGIN * 2;
-            let baseCanvasHeight = ROWS * CELL_SIZE + MARGIN * 2 + BUTTON_HEIGHT + TITLE_SPACE;
-            
-            let availableWidth = window.innerWidth - 20;
-            let availableHeight = window.innerHeight - 100; // Minder ruimte voor navigatie
-            
-            let scaleByWidth = availableWidth / baseCanvasWidth;
-            let scaleByHeight = availableHeight / baseCanvasHeight;
-            
-            let newScale = Math.min(scaleByWidth, scaleByHeight);
-            newScale = constrain(newScale, 0.25, 1); // Nog kleiner toegestaan
-            
-            console.log("Scale by width:", scaleByWidth);
-            console.log("Scale by height:", scaleByHeight);
-            console.log("New SCALE_FACTOR:", newScale);
-            
-            // Update alleen als schaal echt verandert
-            if (Math.abs(SCALE_FACTOR - newScale) > 0.05) {
-                SCALE_FACTOR = newScale;
-                
-                // Force canvas resize via CSS
-                let cnv = document.querySelector('canvas');
-                if (cnv) {
-                    let scaledWidth = baseCanvasWidth * SCALE_FACTOR;
-                    let scaledHeight = baseCanvasHeight * SCALE_FACTOR;
-                    
-                    cnv.style.width = scaledWidth + 'px';
-                    cnv.style.height = scaledHeight + 'px';
-                    cnv.style.maxWidth = '100vw';
-                    
-                    console.log("Canvas scaled to:", scaledWidth, "x", scaledHeight);
-                }
-            }
-        }
-    }, 250); // Wacht 250ms na laatste resize
-});
